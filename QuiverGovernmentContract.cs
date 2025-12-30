@@ -18,7 +18,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Newtonsoft.Json;
 using NodaTime;
 using QuantConnect.Data;
 using QuantConnect.Data.UniverseSelection;
@@ -35,19 +34,16 @@ namespace QuantConnect.DataSource
         /// <summary>
         /// Contract description
         /// </summary>
-        [JsonProperty(PropertyName = "Description")]
         public string Description { get; set; }
         
         /// <summary>
         ///     Awarding Agency Name
         /// </summary>
-        [JsonProperty(PropertyName = "Agency")]
         public string Agency { get; set; }
 
         /// <summary>
         ///     Total dollars obligated under the given contract
         /// </summary>
-        [JsonProperty(PropertyName = "Amount")]
         public decimal Amount { get; set; }
         
         /// <summary>

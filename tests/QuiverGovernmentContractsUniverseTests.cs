@@ -28,23 +28,12 @@ using QuantConnect.Util;
 namespace QuantConnect.DataLibrary.Tests
 {
     [TestFixture]
-    public class QuiverCNBCUniverseTests
+    public class QuiverGovermentContractUniverseTests
     {
         [OneTimeSetUp]
         public void Setup()
         {
             Composer.Instance.GetExportedValueByTypeName<IMapFileProvider>(Configuration.Config.Get("map-file-provider", typeof(LocalDiskMapFileProvider).Name));
-        }
-
-        [Test]
-        public void JsonRoundTrip()
-        {
-            var expected = CreateNewInstance();
-            var type = expected.GetType();
-            var serialized = JsonConvert.SerializeObject(expected);
-            var result = JsonConvert.DeserializeObject(serialized, type);
-
-            AssertAreEqual(expected, result);
         }
 
         [Test]
