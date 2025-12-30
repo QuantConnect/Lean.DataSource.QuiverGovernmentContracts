@@ -88,7 +88,7 @@ namespace QuantConnect.DataLibrary.Tests
 
         private BaseDataCollection CreateNewCollectionInstance()
         {
-            return new QuiverGovernmentContracts
+            return new QuiverGovernmentContract
             {
                 new QuiverGovernmentContract
                 {
