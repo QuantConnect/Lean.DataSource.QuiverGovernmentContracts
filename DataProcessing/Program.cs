@@ -14,9 +14,7 @@
 */
 
 using System;
-using System.Collections.Generic;
 using QuantConnect;
-using QuantConnect.Configuration;
 using QuantConnect.Logging;
 using QuantConnect.Util;
 
@@ -37,11 +35,13 @@ public class Program
         var processingDate = string.IsNullOrWhiteSpace(processingDateValue)
             ? DateTime.UtcNow.AddDays(-1)
             : Parse.DateTimeExact(processingDateValue, "yyyyMMdd");
-
+        
         // Dataset starts from 2022-04-22
-        if (Config.GetBool("reprocess-all", false))
+        var datasetStartDate = new DateTime(2022, 4, 21);
+        if (processingDate < datasetStartDate)
         {
-            processingDate = new(2022, 4, 22);
+            Log.Error($"QuantConnect.DataProcessing.Program.Main(): Invalid processing date, must be greater than {datasetStartDate:yyyyMMdd}.");
+            Environment.Exit(1);
         }
 
         QuiverGovernmentContractDownloader instance = null;
@@ -60,26 +60,14 @@ public class Program
         // The downloader/converter is ran and cleaned up for you safely here.
         try
         {
-            var missingData = new List<string>();
-            while (processingDate < DateTime.UtcNow)
+            // Run the data downloader/converter.
+            if (!instance.Run(processingDate))
             {
-                // Run the data downloader/converter.
-                if (!instance.Run(processingDate))
-                {
-                    Log.Error($"QuantConnect.DataProcessing.Program.Main(): Failed to download/process {QuiverGovernmentContractDownloader.VendorName} {QuiverGovernmentContractDownloader.VendorDataName} data for date: {processingDate:yyyy-MM-dd}");
-                    missingData.Add($"{processingDate: yyyyMMdd}");
-                }
-                processingDate = processingDate.AddDays(1);
+                Log.Error($"QuantConnect.DataProcessing.Program.Main(): Failed to download/process {QuiverGovernmentContractDownloader.VendorName} {QuiverGovernmentContractDownloader.VendorDataName} data for date: {processingDate:yyyy-MM-dd}");
             }
-
+            
             // Process the universe data after all dates have been processed
             instance.ProcessUniverse();
-
-            if (missingData.Count != 0)
-            {
-                // One or more dates failed to process
-                throw new Exception($"\nDates without data:\n{string.Join(',', missingData)}");
-            }
         }
         catch (Exception err)
         {

@@ -89,12 +89,6 @@ public class QuiverGovernmentContractDownloader : IDisposable
         var today = DateTime.UtcNow.Date;
         try
         {
-            if (processDate >= today || processDate == DateTime.MinValue)
-            {
-                Log.Trace($"Encountered data from invalid date: {processDate:yyyy-MM-dd} - Skipping");
-                return false;
-            }
-
             List<RawGovernmentContract> govContractsByDate = [];
 
             var page = 0;
@@ -105,9 +99,7 @@ public class QuiverGovernmentContractDownloader : IDisposable
                 {
                     break;
                 }
-                govContractsByDate.AddRange(JsonConvert.DeserializeObject<List<RawGovernmentContract>>(
-                    string.IsNullOrWhiteSpace(quiverGovContractsData) ? "[]" : quiverGovContractsData,
-                    _jsonSerializerSettings));
+                govContractsByDate.AddRange(JsonConvert.DeserializeObject<List<RawGovernmentContract>>(quiverGovContractsData, _jsonSerializerSettings));
             }
 
             if (govContractsByDate.IsNullOrEmpty()) return false;
