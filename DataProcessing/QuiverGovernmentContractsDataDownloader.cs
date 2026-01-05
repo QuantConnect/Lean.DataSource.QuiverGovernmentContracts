@@ -69,7 +69,15 @@ public class QuiverGovernmentContractDownloader : IDisposable
         _destinationFolder = Path.Combine(outputDirectory, "alternative", VendorName, VendorDataName);
         Directory.CreateDirectory(_destinationFolder);
         _processedDataDirectory = Path.Combine(Globals.DataFolder, "alternative", VendorName, VendorDataName);
-        Directory.CreateDirectory(_processedDataDirectory);
+        try 
+        { 
+            Directory.CreateDirectory(_processedDataDirectory); 
+        }
+        catch 
+        {
+            // We might be running in an environment where we don't have access to create directories
+            // so we do nothing with the exception
+        }
 
         var mapFileProvider = new LocalZipMapFileProvider();
         mapFileProvider.Initialize(new DefaultDataProvider());
@@ -167,7 +175,10 @@ public class QuiverGovernmentContractDownloader : IDisposable
             }
         }
 
-        Directory.EnumerateFiles(_processedDataDirectory, "*.csv").DoForEach(processFile);
+        if (Directory.Exists(_processedDataDirectory))
+        {
+            Directory.EnumerateFiles(_processedDataDirectory, "*.csv").DoForEach(processFile);
+        }
         Directory.EnumerateFiles(_destinationFolder, "*.csv").DoForEach(processFile);
 
         dataBydate.DoForEach((kvp) =>
